@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+//Tables: 1. User Roles, 2.User, 3.Policy, 4.Claim, 5.Audit Log
+model UserRole {
+  id             Int     @id @default(autoincrement())
+  roleName       String  @unique
+  approvalLimit  Int?
+  users          User[]
+  assignedClaims Claim[]
+}
+
+model User {
+  id           String     @id @default(uuid())
+  employeeId   Int        @unique
+  name         String
+  email        String     @unique
+  passwordHash String
+  officeName   String
+  isActive     Boolean    @default(true)
+  roleId       Int
+  auditLog     AuditLog[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  claimsCreated Claim[]  @relation("createdBy")
+  // claimsAssigned Claim[] @relation("assignedClaims")
+  role          UserRole @relation(fields: [roleId], references: [id])
+}
+
+model Claim {
+  id             Int        @id @default(autoincrement())
+  claimNumber    String     @unique
+  policyId       Int        @unique //Foreign Key to Policy
+  createdBy      String
+  status         String
+  assignedRoleId Int
+  dateOfDeath    DateTime
+  auditLogs      AuditLog[]
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  policy       Policy   @relation(fields: [policyId], references: [id])
+  user         User     @relation("createdBy", fields: [createdBy], references: [id], onDelete: Cascade)
+  assignedRole UserRole @relation(fields: [assignedRoleId], references: [id], onDelete: Cascade)
+}
+
+model Policy {
+  id               Int      @id @default(autoincrement())
+  policyNumber     String   @unique
+  sumAssured       Int
+  dateOfAcceptance DateTime
+  nominee          String
+  claim            Claim? //A policy can have a claim ID or not
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  claimId   Int //Foreign Key Reference to Claim
+  userId    String //Foreign Key Reference to User
+  action    String //Action performed by each user
+  remarks   String //Remarsk given by each user
+  createdAt DateTime @default(now()) //Date&TIme whenver an action/remark is provided
+
+  claim Claim @relation(fields: [claimId], references: [id])
+  user  User  @relation(fields: [userId], references: [id])
+}
