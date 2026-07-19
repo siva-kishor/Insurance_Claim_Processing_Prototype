@@ -1,4 +1,6 @@
 import express from "express";
+import authRoutes from "../src/routes/authRoutes.js";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
@@ -6,6 +8,7 @@ const app = express();
 app.use(express.json());
 
 //API routes
+app.use("/auth", authRoutes);
 
 //Test
 app.get("/test", (req, res) => {
