@@ -23,16 +23,16 @@ const login = async (req, res) => {
     }
 
     //get jwt token
-    const token = generateToken(user.employeeId, user.roleId, res);
+    generateToken(user.id, user.roleId, res);
 
     //return resoponse with token
     res.status(200).json({
-      status: "Success",
+      status: "success",
       user: {
         employeeId: user.employeeId,
-        role: user.roleId,
+        roleId: user.roleId,
+        name: user.name,
       },
-      token,
     });
   } catch (err) {
     console.error(`Error while login: ${err}`);
@@ -40,5 +40,18 @@ const login = async (req, res) => {
   }
 };
 
-export { login };
-//const logout;
+const logout = (req, res) => {
+  //reset cookie to empty
+  res.clearCookie("jwt", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+
+  res.status(200).json({
+    status: "success",
+    message: "Logged out successfully.",
+  });
+};
+
+export { login, logout };
