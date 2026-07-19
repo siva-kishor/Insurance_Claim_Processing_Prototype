@@ -1,5 +1,5 @@
 import express from "express";
-import { login, logout } from "../controllers/authController.js";
+import { login, logout, changePassord } from "../controllers/authController.js";
 import validate from "../middleware/validateRequest.js";
 import { loginSchema } from "../validators/authValidators.js";
 
@@ -7,6 +7,7 @@ const router = express.Router();
 
 router.post("/login", validate(loginSchema), login);
 router.post("/logout", logout);
+router.post("/change-password", changePassord); //ADD SCHEMA LATER
 
 export default router;
 

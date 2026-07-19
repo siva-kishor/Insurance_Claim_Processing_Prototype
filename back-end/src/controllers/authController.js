@@ -54,4 +54,8 @@ const logout = (req, res) => {
   });
 };
 
-export { login, logout };
+const changePassord = async (req, res) => {
+  console.log("hello world");
+};
+
+export { login, logout, changePassord };
