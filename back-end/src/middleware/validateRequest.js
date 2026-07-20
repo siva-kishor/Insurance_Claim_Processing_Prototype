@@ -1,15 +1,11 @@
 import { z } from "zod";
+import { handleZodError } from "../utils/handleZodError.js";
 
 const validateRequest = (schema) => {
   return (req, res, next) => {
     const result = schema.safeParse(req.body);
     if (!result.success) {
-      const pretty = z.prettifyError(result.error);
-      console.log(`Error validating user input: ${pretty}`);
-
-      return res.status(400).json({
-        error: pretty,
-      });
+      return next(result.error);
     }
     req.body = result.data;
     next();

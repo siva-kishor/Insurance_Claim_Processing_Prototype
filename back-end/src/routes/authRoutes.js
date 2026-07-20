@@ -1,13 +1,28 @@
 import express from "express";
-import { login, logout, changePassord } from "../controllers/authController.js";
+import {
+  login,
+  logout,
+  getProfile,
+  changePassord,
+} from "../controllers/authController.js";
 import validate from "../middleware/validateRequest.js";
-import { loginSchema } from "../validators/authValidators.js";
+import {
+  loginSchema,
+  changePasswordSchema,
+} from "../validators/authSchemas.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
 router.post("/login", validate(loginSchema), login);
 router.post("/logout", logout);
-router.post("/change-password", changePassord); //ADD SCHEMA LATER
+router.get("/profile", authMiddleware, getProfile);
+router.patch(
+  "/change-password",
+  authMiddleware,
+  validate(changePasswordSchema),
+  changePassord,
+);
 
 export default router;
 
